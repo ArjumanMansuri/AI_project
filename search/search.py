@@ -87,41 +87,54 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     # define a stack for open list
     open_stack = util.Stack()
     # initialize open stack with start position
     open_stack.push((problem.getStartState(),'origin',0))
     # define a stack for closed list
-    closed_queue = util.Queue()
+    closed_stack = util.Stack()
+    backtrack_checkpoints = util.Stack()
     visited_list = []
 
     while not open_stack.isEmpty():
+
         X = open_stack.pop()
+        parent = X
         visited_list.append(X[0])
         if problem.isGoalState(X[0]):
+            closed_stack.push(X)
             break
         else:
             # generate successors of X
             children_of_X = problem.getSuccessors(X[0])
-
             # push X on closed stack
-            closed_queue.push(X)
-
+            closed_stack.push(X)
+            alreadyVisitedChildren = 0
             for each_child in children_of_X:
                 if (each_child[0] in visited_list):
-                    pass
+                    alreadyVisitedChildren +=1
                 else:
                     open_stack.push(each_child)
+
+            if (len(children_of_X) - alreadyVisitedChildren) > 1:
+                backtrack_checkpoints.push(X)
+                if len(children_of_X) == 4:
+                    backtrack_checkpoints.push(X)
+
+            if alreadyVisitedChildren == len(children_of_X):
+                return_point = backtrack_checkpoints.pop()
+                temp_point = closed_stack.pop()
+                while return_point[0] != temp_point[0]:
+                    temp_point = closed_stack.pop()
+                closed_stack.push(temp_point)
     actions = []
-    while not closed_queue.isEmpty():
-        dir = closed_queue.pop()[1]
+    while not closed_stack.isEmpty():
+        dir = closed_stack.pop()[1]
         if dir!='origin':
                 actions.append(dir)
     #util.raiseNotDefined()
+    actions.reverse()
     return actions
 
 def breadthFirstSearch(problem):
