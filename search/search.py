@@ -185,33 +185,30 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    # define a stack for open list
-    open_queue = util.PriorityQueue()
-    # initialize open stack with start position
-    open_queue.push((problem.getStartState(), [], 0),0)
-    # define a stack for closed list
-    #closed_stack = util.Stack()
-    visited_set = set()
-    while not open_queue.isEmpty():
-        X, actions, cost = open_queue.pop()
-        visited_set.add(X[0])
-        if problem.isGoalState(X[0]):
-            #closed_stack.push(X)
-            return actions
-        else:
-            # generate successors of X
-            children_of_X = problem.getSuccessors(X)
-            # push X on closed stack
-            #closed_stack.push(X)
-            for each_child in children_of_X:
-                if (each_child[0] in visited_set):
-                    pass
-                else:
-                    actions = actions + [each_child[1]]
-                    open_queue.push((each_child[0],actions,each_child[2]+cost),each_child[2]+cost)
+    visited = []  # List of already visisted nodes
+    actions = []  # List of actions taken to get to the current node
+    total_cost = 0
+
+    PriorityQ = util.PriorityQueue()
+
+    PriorityQ.push((problem.getStartState(), actions, total_cost), total_cost)
+
+    while not PriorityQ.isEmpty():
+        node, actions, total_cost = PriorityQ.pop()
+
+        if not node in visited:
+            visited.append(node)
+
+            if problem.isGoalState(node):
+                return actions
+
+            successors = problem.getSuccessors(node)
+
+            for successor in successors:
+                PriorityQ.push((successor[0], actions + [successor[1]], total_cost+successor[2]), total_cost+successor[2])
 
     return []
-    util.raiseNotDefined()
+#    util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
