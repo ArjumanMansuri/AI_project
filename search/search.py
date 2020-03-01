@@ -190,7 +190,7 @@ def uniformCostSearch(problem):
     # initialize open stack with start position
     open_queue.push((problem.getStartState(), [], 0), 0)
     visited_set = set()
-    nodes_expanded = []
+    closed_list = []
     while not open_queue.isEmpty():
         X, actions, cost = open_queue.pop()
         visited_set.add(X)
@@ -198,9 +198,9 @@ def uniformCostSearch(problem):
             return actions
         else:
             # generate successors of X
-            if (X not in nodes_expanded):
+            if (X not in closed_list):
                 children_of_X = problem.getSuccessors(X)
-                nodes_expanded.append(X)
+                closed_list.append(X)
 
                 for each_child in children_of_X:
                     if (each_child[0] in visited_set):
@@ -218,8 +218,31 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # define a stack for open list
+    open_queue = util.PriorityQueue()
+    # initialize open stack with start position
+    open_queue.push((problem.getStartState(), [], 0), 0)
+    visited_set = set()
+    closed_list = []
+    while not open_queue.isEmpty():
+        X, actions, cost = open_queue.pop()
+        visited_set.add(X)
+        if problem.isGoalState(X):
+            return actions
+        else:
+            # generate successors of X
+            if (X not in closed_list):
+                children_of_X = problem.getSuccessors(X)
+                closed_list.append(X)
+
+                for each_child in children_of_X:
+                    if (each_child[0] in visited_set):
+                        pass
+                    else:
+                        heuristic_value = heuristic(each_child[0],problem)
+                        open_queue.update((each_child[0], actions + [each_child[1]], each_child[2] + cost),
+                                          each_child[2] + cost + heuristic_value)
+    return []
 
 
 # Abbreviations
