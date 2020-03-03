@@ -138,54 +138,29 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    # define a stack for open list
+    # define a queue for open list
     open_queue = util.Queue()
     # initialize open stack with start position
-    open_queue.push((problem.getStartState(), 'origin', 0))
-    # define a stack for closed list
-    closed_stack = util.Stack()
-    visited_set = set()
-    parent_dict ={}
+    open_queue.push((problem.getStartState(), []))
+    visited_list = []
 
     while not open_queue.isEmpty():
-        X = open_queue.pop()
-        visited_set.add(X[0])
-        if problem.isGoalState(X[0]):
-            closed_stack.push(X)
-            break
-        else:
-            # generate successors of X
-            children_of_X = problem.getSuccessors(X[0])
-            # push X on closed stack
-            closed_stack.push(X)
-            for each_child in children_of_X:
-                if (each_child[0] in visited_set):
-                    pass
-                else:
-                    parent_dict[each_child[0]] = X[0]
-                    open_queue.push(each_child)
-                    visited_set.add(each_child[0])
+        X, actions = open_queue.pop()
+        if X not in visited_list:
+            visited_list.append(X)
+            if problem.isGoalState(X):
+                return actions
+            else:
+                # generate successors of X
+                    children_of_X = problem.getSuccessors(X)
 
-    actions = []
-    X = closed_stack.pop()
-    actions.append(X[1])
-
-    while not closed_stack.isEmpty():
-        X_parent = parent_dict[X[0]]
-        X = closed_stack.pop()
-        while X[0]!=X_parent:
-            X = closed_stack.pop()
-        if X[1]!='origin':
-            actions.append(X[1])
-
-    actions.reverse()
-    return actions
+                    for each_child in children_of_X:
+                            open_queue.push((each_child[0], actions + [each_child[1]]))
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    # define a stack for open list
+    # define a queue for open list
     open_queue = util.PriorityQueue()
     # initialize open stack with start position
     open_queue.push((problem.getStartState(), [], 0), 0)
