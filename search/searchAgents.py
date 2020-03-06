@@ -343,7 +343,7 @@ class CornersProblem(search.SearchProblem):
                 if currentPosition in self.corners:
                     cornerIndex = self.corners.index(currentPosition)
                     temp_goal_visited_list[cornerIndex] = True
-                    successorState = ((currentPosition,temp_goal_visited_list),action,1)
+                    successorState = ((currentPosition, temp_goal_visited_list), action, 1)
                 else:
                     successorState = ((currentPosition, temp_goal_visited_list), action, 1)
 
@@ -383,7 +383,55 @@ def cornersHeuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    import sys
+    import copy
+    current_position = state[0]
+    print(current_position)
+    # if current position = visited corner we can try removing that corner from the goal_visited list/corners
+    goal_visited = state[1]
+    print(goal_visited)
+    distances = []
+    total_distance = 0
+    unvisited_corners = []
+    current_corner = ()
+    for idx,each in enumerate(goal_visited):
+        if not each:
+            unvisited_corners.append(corners[idx])
+    if current_position not in corners:
+        for idx,each in enumerate(goal_visited):
+            print(each)
+            if not each:
+                corner = corners[idx]
+                distance = util.manhattanDistance(current_position, corner)
+                distances.append(distance)
+            else:
+                distances.append(0)
+        current_corner = corners[distances.index(min(distances))]
+        total_distance = min(distances)
+    else:
+        current_corner = copy.deepcopy(current_position)
+
+    while len(unvisited_corners) > 1:
+        if current_corner!=current_position:
+            unvisited_corners.remove(current_corner)
+        min_distance = sys.maxsize
+        current_corner_persist = copy.deepcopy(current_corner)
+        for each_corner in unvisited_corners:
+            distance = util.manhattanDistance(current_corner, each_corner)
+            if distance < min_distance:
+                min_distance = distance
+                current_corner_persist = each_corner
+        total_distance += min_distance
+        current_corner = copy.deepcopy(current_corner_persist)
+    return total_distance
+
+
+
+
+    # if len(distances) == 0:
+    #     return 0
+    # else:
+    #     return min(distances)
 
 
 class AStarCornersAgent(SearchAgent):
