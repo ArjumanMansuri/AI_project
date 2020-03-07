@@ -386,53 +386,43 @@ def cornersHeuristic(state, problem):
     import sys
     import copy
     current_position = state[0]
-    print(current_position)
     # if current position = visited corner we can try removing that corner from the goal_visited list/corners
     goal_visited = state[1]
-    print(goal_visited)
-    distances = []
-    total_distance = 0
     unvisited_corners = []
-    current_corner = ()
+    # get the unvisited corners
     for idx,each in enumerate(goal_visited):
         if not each:
             unvisited_corners.append(corners[idx])
-    if current_position not in corners:
-        for idx,each in enumerate(goal_visited):
-            print(each)
-            if not each:
-                corner = corners[idx]
-                distance = util.manhattanDistance(current_position, corner)
-                distances.append(distance)
-            else:
-                distances.append(0)
-        current_corner = corners[distances.index(min(distances))]
-        total_distance = min(distances)
-    else:
-        current_corner = copy.deepcopy(current_position)
 
-    while len(unvisited_corners) > 1:
-        if current_corner!=current_position:
-            unvisited_corners.remove(current_corner)
+    total_distance = 0
+    # if the current position is not a corner, find the nearest unvisited corner
+    nearest_corner = copy.deepcopy(current_position)
+    if current_position not in corners:
         min_distance = sys.maxsize
-        current_corner_persist = copy.deepcopy(current_corner)
-        for each_corner in unvisited_corners:
-            distance = util.manhattanDistance(current_corner, each_corner)
+        for each_unvisited_corner in unvisited_corners:
+            distance = util.manhattanDistance(current_position,each_unvisited_corner)
             if distance < min_distance:
                 min_distance = distance
-                current_corner_persist = each_corner
+                nearest_corner = each_unvisited_corner
+        if min_distance >= 0:
+            total_distance +=min_distance
+
+    if nearest_corner in unvisited_corners:
+        unvisited_corners.remove(nearest_corner)
+
+    next_nearest_corner = ()
+    while unvisited_corners:
+        min_distance = sys.maxsize
+        for each_unvisited_corner in unvisited_corners:
+            distance = util.manhattanDistance(nearest_corner,each_unvisited_corner)
+            if distance < min_distance:
+                min_distance = distance
+                next_nearest_corner = each_unvisited_corner
+        nearest_corner = next_nearest_corner
+        unvisited_corners.remove(next_nearest_corner)
         total_distance += min_distance
-        current_corner = copy.deepcopy(current_corner_persist)
+
     return total_distance
-
-
-
-
-    # if len(distances) == 0:
-    #     return 0
-    # else:
-    #     return min(distances)
-
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
