@@ -197,11 +197,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     open_queue = util.PriorityQueue()
     # initialize open stack with start position
     open_queue.push((problem.getStartState(), [], 0), 0)
-    visited_set = set()
+    visited_set = []
     closed_list = []
     while not open_queue.isEmpty():
         X, actions, cost = open_queue.pop()
-        visited_set.add(X)
+        visited_set.append(X)
         if problem.isGoalState(X):
             return actions
         else:
