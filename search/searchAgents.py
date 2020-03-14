@@ -520,10 +520,83 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    import sys
+    import copy
+    import math
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
 
+    # uneaten = foodGrid.asList()
+    # mdist = ((0, 0), (0, 0), 0)
+    # heur = n1 = n2 = 0
+    #
+    # # check to see if there are some food pieces on board
+    # if (len(uneaten) == 0):
+    #     return heur
+    #
+    # # find maximum distance between two food pieces
+    # for i in uneaten:
+    #     for j in uneaten:
+    #         if not (i == j):
+    #             dist = mazeDistance(i,j,problem.startingGameState)
+    #             if (mdist[2] < dist):
+    #                 mdist = (i, j, dist)
+    #                 n1 = mazeDistance(i,position,problem.startingGameState)
+    #                 n2 = mazeDistance(j,position,problem.startingGameState)
+    #
+    # if n1 > n2:
+    #     start = n2
+    # else:
+    #     start = n1
+    #
+    # # only one food item in the uneaten list
+    # if ((mdist[0], mdist[1]) == ((0, 0), (0, 0))):
+    #     heur = mazeDistance(position, uneaten[0], problem.startingGameState)
+    #
+    # # heuristic value is the distance from the start to closest node
+    # # + the maximum distance between nodes
+    # else:
+    #     heur = mdist[2] + start
+    #
+    # return heur
+
+    foodList = foodGrid.asList()
+
+    import math
+    foodList = foodGrid.asList()
+    if foodGrid.count() == 0:
+        return 0
+
+    total_distance = 0
+
+    unvisited_food_list = copy.deepcopy(foodList)
+    min_distance = sys.maxsize
+    for each_unvisited_food in unvisited_food_list:
+        distance = mazeDistance(position, each_unvisited_food,problem.startingGameState)
+        if distance < min_distance:
+            min_distance = distance
+    total_distance += min_distance
+
+    if len(unvisited_food_list) > 1:
+        max_distance = 0
+        for idx,each_food in enumerate(unvisited_food_list):
+            if idx < (len(unvisited_food_list) - 1):
+                for i in range(idx+1,len(unvisited_food_list)):
+                    next_food = unvisited_food_list[i]
+                    distance = mazeDistance(each_food, next_food,problem.startingGameState)
+                    if distance > max_distance:
+                        max_distance = distance
+        total_distance += max_distance
+    return total_distance
+
+    # if foodGrid.count()==0:
+    #     return 0
+    # unvisited_food_list = copy.deepcopy(foodList)
+    # max_distance = 0
+    # for each_unvisited_food in unvisited_food_list:
+    #     distance = mazeDistance(position, each_unvisited_food,problem.startingGameState)
+    #     if distance > max_distance:
+    #         max_distance = distance
+    # return max_distance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -553,9 +626,10 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
+        return search.uniformCostSearch(problem)
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        #util.raiseNotDefined()
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -589,10 +663,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x, y = state
-
+        foodList = self.food.asList()
+        if state in foodList:
+            return True
+        else:
+            return False
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #util.raiseNotDefined()
 
 
 def mazeDistance(point1, point2, gameState):
